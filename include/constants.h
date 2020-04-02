@@ -1,7 +1,10 @@
 #pragma once
 
-#define BIGSTONE 1
-#define SMALLSTONE 0
-#define EMPTY -1
+#define INF 99999999
 
-#define POSITION std::pair<short, short>
+typedef std::pair<short, short> POSITION;
+
+enum PLAYER
+{
+	SMALLSTONE, BIGSTONE, EMPTY = -1
+};

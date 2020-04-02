@@ -1,6 +1,7 @@
 #include "Board.h"
 #include "constants.h"
 #include <iostream>
+#include <vector>
 
 Board::Board()
 {
@@ -18,8 +19,12 @@ Board::Board()
 				board[i][j] = 1;
 				bigstone_loc[cnt++] = std::make_pair(i, j);
 			}
+			else if ((i == 2 && (j == 2 || j == 4)) || (i == 4 && (j == 2 || j == 4)))
+			{
+				board[i][j] = 4;
+			}
 			else
-				board[i][j] = 0;
+				board[i][j] = -1;
 		}
 	}
 
@@ -27,13 +32,19 @@ Board::Board()
 	smallstone_count = 20;
 }
 
-bool Board::can_cross(POSITION loc)
+inline bool Board::can_cross(POSITION loc)
 {
 	if (loc.first == loc.second || (loc.first - 1 == 5 - loc.second))
 		return true;
 	return false;
 }
 
+inline bool Board::valid_pos(POSITION loc)
+{
+	if (loc.first >= 1 && loc.first <= maxRows && loc.second >= 1 && loc.second <= maxCols)
+		return true;
+	return false;
+}
 void Board::print_board()
 {
 	std::cout << "\n\n";
@@ -51,9 +62,13 @@ void Board::print_board()
 
 		for (short j = 1; j <= maxCols; j++)
 		{
-			std::cout << board[i][j] << "    ";
+			if (board[i][j] == EMPTY)
+				std::cout << "_" << "    ";
+			else
+				std::cout << board[i][j] << "    ";
 		}
 	}
+	std::cout << "\n";
 }
 
 
@@ -131,14 +146,58 @@ int Board::get_points(short player)
 
 bool Board::is_stuck(POSITION loc)
 {
-
+	if (generate_moves(loc).empty()) 
+		return true;
 	return false;
 }
 
-POSITION* generate_moves(POSITION loc)
+std::vector<POSITION> Board::generate_moves(POSITION loc)
 {
-	POSITION* dest;
+		
+	std::vector<POSITION> moves;
+	if (board[loc.first][loc.second] == EMPTY)
+		return moves;
 
-	return NULL;
+	POSITION newPos;
+	for (short i = 0; i < 4; i++)
+	{
+		newPos.first = loc.first + noncrossmove_x[i];
+		newPos.second = loc.second + noncrossmove_y[i];
+
+		if (valid_pos(newPos) && board[newPos.first][newPos.second] == EMPTY)
+			moves.emplace_back(newPos);
+
+		if (can_cross(loc))
+		{
+			newPos.first = loc.first + crossmove_x[i];
+			newPos.second = loc.second + crossmove_y[i];
+
+			if (valid_pos(newPos) && board[newPos.first][newPos.second] == EMPTY)
+				moves.emplace_back(newPos);
+		}
+	}
+
+	if (board[loc.first][loc.second] == BIGSTONE)
+	{
+		for (short i = 0; i < 4; i++)
+		{
+			newPos.first = loc.first + noncrossmove_x[i] == 0 ? 0: noncrossmove_x[i]*2;
+			newPos.second = loc.second + noncrossmove_y[i] == 0 ? 0: noncrossmove_y[i]*2;
+
+			if (valid_pos(newPos) && board[newPos.first][newPos.second] == EMPTY)
+				moves.emplace_back(newPos);
+
+			if (can_cross(loc))
+			{
+				newPos.first = loc.first + 2*crossmove_x[i];
+				newPos.second = loc.second + 2*crossmove_y[i];
+
+				if (valid_pos(newPos) && board[newPos.first][newPos.second] == EMPTY)
+					moves.emplace_back(newPos);
+			}
+		}
+	}
+		
+	return moves;
 }
 

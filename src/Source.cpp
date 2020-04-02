@@ -8,4 +8,6 @@ int main()
 {
 	Board newBoard;
 	newBoard.print_board();
+
+	
 }

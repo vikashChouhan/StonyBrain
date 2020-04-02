@@ -1,6 +1,6 @@
 #include "agent.h"
+#include "constants.h"
 
-#define INF 99999999
 
 agent::agent(int depth, bool fast)
 {

@@ -1,9 +1,8 @@
 #pragma once
 
-#include "constants.h"
 #include <utility>
-
-
+#include "constants.h"
+#include <vector>
 class Board
 {
 private:
@@ -14,8 +13,14 @@ private:
 	short bigstone_count, smallstone_count;
 	POSITION bigstone_loc[4];
 
+	short noncrossmove_x [4] = { 0,0,1,-1, };
+	short noncrossmove_y [4] = { 1,-1,0,0 };
 
-	bool can_cross(POSITION);
+	short crossmove_x[4] = { 1,1,-1,-1 };
+	short crossmove_y[4] = { 1,-1,1,-1 };
+	
+	inline bool can_cross(POSITION);
+	inline bool valid_pos(POSITION);
 
 public:
 	
@@ -29,6 +34,6 @@ public:
 	int get_points(short);
 
 	bool is_stuck(POSITION);
-	POSITION* generate_moves(POSITION);
+	std::vector<POSITION> generate_moves(POSITION);
 };
 
