@@ -7,13 +7,13 @@ class agent
 private:
 	int maxDepth, alpha , beta;
 	bool optimize;
+	PLAYER _player;
 
 public:
 
-	agent(int, bool);
+	agent(PLAYER, int , bool);
 
-	int generate_move(short, short, short, short);
-
-	Board make_move(Board);
+	int get_move(Board&, int, PLAYER, std::pair<POSITION,POSITION>&);
+	void make_move(Board&);
 };
 

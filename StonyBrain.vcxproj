@@ -166,11 +166,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\agent.cpp" />
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\game.h" />
     <ClInclude Include="include\agent.h" />
     <ClInclude Include="include\Board.h" />
     <ClInclude Include="include\constants.h" />

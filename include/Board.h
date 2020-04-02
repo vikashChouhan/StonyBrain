@@ -21,19 +21,17 @@ private:
 	
 	inline bool can_cross(POSITION);
 	inline bool valid_pos(POSITION);
-
+	std::vector<POSITION> generate_moves(POSITION);
 public:
 	
 	Board();
 
 	void print_board();
-	
+	bool smallstonewin();
 	short make_move(POSITION, POSITION);
 	short reverse_move(POSITION, POSITION);
-
-	int get_points(short);
-
+	int get_points(PLAYER);
 	bool is_stuck(POSITION);
-	std::vector<POSITION> generate_moves(POSITION);
+	void generate_moves(PLAYER, std::vector<std::pair<POSITION, std::vector<POSITION>> >&);
 };
 

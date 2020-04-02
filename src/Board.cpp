@@ -85,7 +85,7 @@ short Board::make_move(POSITION start, POSITION end)
 	//update bigstone location
 	for (short i = 0; i < 4; i++)
 	{
-		if (bigstone_loc[i] == start);
+		if (bigstone_loc[i] == start)
 		{
 			bigstone_loc[i] = end;
 			break;
@@ -125,7 +125,7 @@ short Board::reverse_move(POSITION start, POSITION end)
 	return 1;
 }
 
-int Board::get_points(short player)
+int Board::get_points(PLAYER player)
 {
 	short count_bigstone_cannot_move = 0;
 	//check if bigstone can move or not
@@ -137,10 +137,10 @@ int Board::get_points(short player)
 
 	if (player == BIGSTONE)
 	{
-		return -count_bigstone_cannot_move * 5 + (20 - smallstone_count);
+		return count_bigstone_cannot_move * 5 + (20 - smallstone_count) - smallstone_count;
 	}
 	else
-		return 5 * count_bigstone_cannot_move + smallstone_count;
+		return 5 * count_bigstone_cannot_move + smallstone_count - (20 - smallstone_count);
 }
 
 
@@ -184,6 +184,9 @@ std::vector<POSITION> Board::generate_moves(POSITION loc)
 			newPos.first = loc.first + noncrossmove_x[i] == 0 ? 0: noncrossmove_x[i]*2;
 			newPos.second = loc.second + noncrossmove_y[i] == 0 ? 0: noncrossmove_y[i]*2;
 
+			if (board[loc.first + noncrossmove_x[i]][loc.second + noncrossmove_y[i]] != SMALLSTONE)
+				continue;
+
 			if (valid_pos(newPos) && board[newPos.first][newPos.second] == EMPTY)
 				moves.emplace_back(newPos);
 
@@ -191,6 +194,9 @@ std::vector<POSITION> Board::generate_moves(POSITION loc)
 			{
 				newPos.first = loc.first + 2*crossmove_x[i];
 				newPos.second = loc.second + 2*crossmove_y[i];
+
+				if (board[loc.first + crossmove_x[i]][loc.second + crossmove_y[i]] != SMALLSTONE)
+					continue;
 
 				if (valid_pos(newPos) && board[newPos.first][newPos.second] == EMPTY)
 					moves.emplace_back(newPos);
@@ -201,3 +207,27 @@ std::vector<POSITION> Board::generate_moves(POSITION loc)
 	return moves;
 }
 
+bool Board::smallstonewin()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		if (!is_stuck(bigstone_loc[i]))
+			return false;
+	}
+	return true;
+}
+
+void Board::generate_moves(PLAYER player, 
+	std::vector<std::pair<POSITION, std::vector<POSITION>> >&moves)
+{
+	for (short i = 1; i <= maxRows; i++)
+	{
+		for (short j = 1; j <= maxCols; j++)
+		{
+			if (board[i][j] == player)
+			{
+				moves.emplace_back(std::make_pair(POSITION(i, j), generate_moves(POSITION(i, j))));
+			}
+		}
+	}
+}
