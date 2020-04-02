@@ -3,28 +3,32 @@
 #include <iostream>
 #include <vector>
 
+
+
+
+
 Board::Board()
 {
-	board = new short* [6];
+	board = new char* [6];
 	short cnt = 0;
 
 	for (short i = 0; i <= maxRows; i++)
 	{
-		board[i] = new short[6];
+		board[i] = new char[6];
 		
 		for (short j = 0; j <= maxCols; j++)
 		{
 			if ((j == 1 || j == 5) && (i == 1 || i == 5))
 			{
-				board[i][j] = 1;
+				board[i][j] = BIGSTONE;
 				bigstone_loc[cnt++] = std::make_pair(i, j);
 			}
 			else if ((i == 2 && (j == 2 || j == 4)) || (i == 4 && (j == 2 || j == 4)))
 			{
-				board[i][j] = 4;
+				board[i][j] = '5';
 			}
 			else
-				board[i][j] = -1;
+				board[i][j] = EMPTY;
 		}
 	}
 
@@ -62,13 +66,11 @@ void Board::print_board()
 
 		for (short j = 1; j <= maxCols; j++)
 		{
-			if (board[i][j] == EMPTY)
-				std::cout << "_" << "    ";
-			else
-				std::cout << board[i][j] << "    ";
+			std::cout << board[i][j] << "    ";
 		}
 	}
-	std::cout << "\n";
+	std::cout << "\n\n";
+	std::cout << "Baggi Killed : " << 20 - smallstone_count << "\n\n";
 }
 
 
@@ -79,8 +81,16 @@ short Board::make_move(POSITION start, POSITION end)
 		return 0;
 
 	// make move
-	board[end.first][end.second] = board[start.first][start.second];
-	board[start.first][start.second] = EMPTY;
+	if (board[start.first][start.second] == SMALLSTONE || board[start.first][start.second] == BIGSTONE)
+	{
+		board[end.first][end.second] = board[start.first][start.second];
+		board[start.first][start.second] = EMPTY;
+	}
+	else
+	{
+		board[end.first][end.second] = SMALLSTONE;
+		board[start.first][start.second] = board[start.first][start.second] == '2' ? SMALLSTONE : board[start.first][start.second] - 1;
+	}
 
 	//update bigstone location
 	for (short i = 0; i < 4; i++)
@@ -94,8 +104,12 @@ short Board::make_move(POSITION start, POSITION end)
 
 	// reduce smallstone count if it destroyed
 	if (abs(start.first - end.first) == 2 || abs(start.second - end.second) == 2)
+	{
+		short mid_x = start.first + (end.first - start.first) / 2;
+		short mid_y = start.second + (end.second - start.second) / 2;
+		board[mid_x][mid_y] = EMPTY;
 		smallstone_count = smallstone_count > 0 ? smallstone_count - 1 : 0;
-
+	}
 	return 1;
 }
 
@@ -181,21 +195,24 @@ std::vector<POSITION> Board::generate_moves(POSITION loc)
 	{
 		for (short i = 0; i < 4; i++)
 		{
-			newPos.first = loc.first + noncrossmove_x[i] == 0 ? 0: noncrossmove_x[i]*2;
-			newPos.second = loc.second + noncrossmove_y[i] == 0 ? 0: noncrossmove_y[i]*2;
+			newPos.first = loc.first + noncrossmove_x[i]*2;
+			newPos.second = loc.second + noncrossmove_y[i]*2;
 
-			if (board[loc.first + noncrossmove_x[i]][loc.second + noncrossmove_y[i]] != SMALLSTONE)
+			if (valid_pos(newPos) && board[loc.first + (newPos.first - loc.first) / 2][loc.second + (newPos.second - loc.second) / 2] != SMALLSTONE)
 				continue;
 
 			if (valid_pos(newPos) && board[newPos.first][newPos.second] == EMPTY)
 				moves.emplace_back(newPos);
+		}
 
-			if (can_cross(loc))
+		if (can_cross(loc))
+		{
+			for (short i = 0; i < 4; i++)
 			{
-				newPos.first = loc.first + 2*crossmove_x[i];
-				newPos.second = loc.second + 2*crossmove_y[i];
+				newPos.first = loc.first + 2 * crossmove_x[i];
+				newPos.second = loc.second + 2 * crossmove_y[i];
 
-				if (board[loc.first + crossmove_x[i]][loc.second + crossmove_y[i]] != SMALLSTONE)
+				if (valid_pos(newPos) && board[loc.first + (newPos.first - loc.first) / 2][loc.second + (newPos.second - loc.second) / 2] != SMALLSTONE)
 					continue;
 
 				if (valid_pos(newPos) && board[newPos.first][newPos.second] == EMPTY)
@@ -224,10 +241,28 @@ void Board::generate_moves(PLAYER player,
 	{
 		for (short j = 1; j <= maxCols; j++)
 		{
-			if (board[i][j] == player)
+			if (board[i][j] == player || (player == SMALLSTONE && board[i][j]!=BIGSTONE && board[i][j]!=EMPTY))
 			{
 				moves.emplace_back(std::make_pair(POSITION(i, j), generate_moves(POSITION(i, j))));
 			}
 		}
 	}
+}
+
+
+bool Board::valid_move(std::pair<POSITION, POSITION> move, PLAYER player)
+{
+	std::vector<POSITION> possibleMoves = generate_moves(move.first);
+
+	if (!valid_pos(move.first) || !valid_pos(move.second))
+		return false;
+	
+	std::cout << "\n";
+	for (auto& newLoc : possibleMoves)
+	{
+		std::cout << newLoc.first << " " << newLoc.second << "\n";
+		if (move.second == newLoc)
+			return true;
+	}
+	return false;
 }

@@ -3,10 +3,14 @@
 #include <utility>
 #include "constants.h"
 #include <vector>
+
+
+
+
 class Board
 {
 private:
-	short **board;
+	char **board;
 	const short maxRows = 5;
 	const short maxCols = 5;
 	
@@ -25,13 +29,23 @@ private:
 public:
 	
 	Board();
-
+	
 	void print_board();
+	
 	bool smallstonewin();
+	
 	short make_move(POSITION, POSITION);
+	
 	short reverse_move(POSITION, POSITION);
+	
 	int get_points(PLAYER);
+	
 	bool is_stuck(POSITION);
+	
 	void generate_moves(PLAYER, std::vector<std::pair<POSITION, std::vector<POSITION>> >&);
+	
+	bool valid_move(std::pair<POSITION, POSITION> move, PLAYER player);
+
+
 };
 

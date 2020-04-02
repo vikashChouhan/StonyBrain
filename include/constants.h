@@ -7,5 +7,5 @@ typedef std::pair<short, short> POSITION;
 
  enum  PLAYER
 {
-	SMALLSTONE, BIGSTONE, EMPTY = -1
+	SMALLSTONE = 'b', BIGSTONE = 'B', EMPTY = '_'
 };

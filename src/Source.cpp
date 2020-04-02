@@ -1,12 +1,11 @@
 #include <iostream>
-#include "Board.h"
-
+#include "game.h"
 
 
 
 int main()
 {
-	Board newBoard;
-	newBoard.print_board();
+	game newGame(SMALLSTONE, BIGSTONE,5,false);
+	newGame.play();
 
 }
