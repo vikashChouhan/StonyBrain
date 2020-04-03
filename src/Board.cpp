@@ -172,16 +172,16 @@ int Board::get_points(PLAYER player)
 	for (short i = 1; i <= maxRows; i++)
 	{
 		for(short j=1; j<=maxCols; j++)
-			if (is_stuck(POSITION(i,j)))
+			if (board[i][j]==BIGSTONE && is_stuck(POSITION(i,j)))
 				count_bigstone_cannot_move++;
 	}
 
 	if (player == BIGSTONE)
 	{
-		return count_bigstone_cannot_move * 5 - (20 - smallstone_count) + smallstone_count;
+		return count_bigstone_cannot_move * 20 - (20 - smallstone_count) + 2*smallstone_count;
 	}
 	else
-		return 5 * count_bigstone_cannot_move + smallstone_count - (20 - smallstone_count);
+		return 20 * count_bigstone_cannot_move + smallstone_count - 2*(20 - smallstone_count);
 }
 
 

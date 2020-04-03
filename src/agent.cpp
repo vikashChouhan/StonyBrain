@@ -7,11 +7,9 @@ agent::agent(PLAYER player, int depth=5, bool fast=false)
 	_player = player;
 	maxDepth = depth;
 	optimize = fast;
-	alpha = INF;
-	beta = -INF;
 }
 
-int agent::get_move(Board &currBoard, int depth, PLAYER player, std::pair<POSITION, POSITION>&return_move)
+int agent::get_move(Board &currBoard, int depth, PLAYER player, std::pair<POSITION, POSITION>&return_move, long int alpha, long int beta)
 {
 	
 	if (currBoard.smallstonewin() || depth == maxDepth)
@@ -35,15 +33,21 @@ int agent::get_move(Board &currBoard, int depth, PLAYER player, std::pair<POSITI
 				currBoard.make_move(pos2mov.first, endPos);
 				//currBoard.print_board();
 				
-				value = get_move(currBoard, depth + 1, BIGSTONE, return_move);
-
+				value = get_move(currBoard, depth + 1, BIGSTONE, return_move,alpha,beta);
 				if (value > bestval)
 				{
 					best_move = std::make_pair(pos2mov.first, endPos);
 					bestval = value;
 				}
-				//std::cout << "reverse b\n";
+				
 				currBoard.reverse_move(pos2mov.first, endPos);
+				if (optimize)
+				{
+					alpha = bestval > alpha ? bestval : alpha;
+					if (beta <= alpha)
+						break;
+				}
+				//std::cout << "reverse b\n";
 			}
 		}
 		return_move = best_move;
@@ -65,7 +69,7 @@ int agent::get_move(Board &currBoard, int depth, PLAYER player, std::pair<POSITI
 				currBoard.make_move(pos2mov.first, endPos);
 				//currBoard.print_board();
 				
-				value = get_move(currBoard, depth + 1, SMALLSTONE, return_move);
+				value = get_move(currBoard, depth + 1, SMALLSTONE, return_move, alpha, beta);
 				
 				if (value < bestval)
 				{
@@ -74,6 +78,13 @@ int agent::get_move(Board &currBoard, int depth, PLAYER player, std::pair<POSITI
 				}
 				//std::cout << "reverse B\n";
 				currBoard.reverse_move(pos2mov.first, endPos);
+
+				if (optimize)
+				{
+					beta = bestval < beta ? bestval : beta;
+					if (beta <= alpha)
+						break;
+				}
 			}
 
 		}
@@ -88,7 +99,7 @@ void agent::make_move(Board& board)
 {
 	std::pair<POSITION, POSITION> move;
 	//std::cout << "change of computer : " << char(_player) << "\n";
-	get_move(board, 0, _player, move);
+	get_move(board, 0, _player, move, -INF, +INF);
 	//std::cout << move.first.first << " " << move.first.second << " ->" << move.second.first << " " << move.second.second<<"\n";
 	//std::cout << "starting moves... \n";
 	std::cout << "\n(" << move.first.first << "," << move.first.second << ")->(" << move.second.first << "," << move.second.second << ")\n";

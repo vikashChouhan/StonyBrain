@@ -5,7 +5,7 @@
 
 int main()
 {
-	game newGame(SMALLSTONE, BIGSTONE, 4,false);
+	game newGame(SMALLSTONE, BIGSTONE, 5, true);
 	newGame.play();
 	std::system("pause");
 }
