@@ -56,13 +56,14 @@ void game::play()
 		else
 			_computer.make_move(_board);
 
-		// printing board after each move
+		 //printing board after each move
 		std::system("cls");
 		_board.print_board();
 		std::cout << "\n";
+		std::system("pause");
 
 		if (_board.smallstonewin()) break;
-		/*
+		
 		if (_userPlayer == SMALLSTONE)
 			_computer.make_move(_board);
 		else
@@ -76,10 +77,10 @@ void game::play()
 				goto again2;
 		}
 
-		// printing board after each move
+		 //printing board after each move
 		std::system("cls");
 		_board.print_board();
-		std::cout << "\n";*/
+		std::cout << "\n";
 	}
 
 

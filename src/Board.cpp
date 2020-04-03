@@ -107,7 +107,13 @@ short Board::make_move(POSITION start, POSITION end)
 	{
 		short mid_x = start.first + (end.first - start.first) / 2;
 		short mid_y = start.second + (end.second - start.second) / 2;
-		board[mid_x][mid_y] = EMPTY;
+		
+		if (board[mid_x][mid_y] == 'b')
+			board[mid_x][mid_y] = EMPTY;
+		else if (board[mid_x][mid_y] == '2')
+			board[mid_x][mid_y] = 'b';
+		else
+			board[mid_x][mid_y]--;
 		smallstone_count = smallstone_count > 0 ? smallstone_count - 1 : 0;
 	}
 	return 1;
@@ -115,12 +121,20 @@ short Board::make_move(POSITION start, POSITION end)
 
 short Board::reverse_move(POSITION start, POSITION end)
 {
-	if (board[start.first][start.second] != EMPTY)
-		return 0;
-	
 	//reverse move
-	board[start.first][start.second] = board[end.first][end.second];
-	board[end.first][end.second] = EMPTY;
+	if (board[end.first][end.second] == BIGSTONE)
+	{
+		board[start.first][start.second] = board[end.first][end.second];
+	}
+	else
+	{
+		if(board[start.first][start.second]!=EMPTY)
+			board[start.first][start.second] = board[start.first][start.second] == 'b' ? '2': board[start.first][start.second] + 1;
+		else
+		{
+			board[start.first][start.second] = 'b';
+		}
+	}
 
 	//update bigstone location
 	for (short i = 0; i < 4; i++)
@@ -134,8 +148,20 @@ short Board::reverse_move(POSITION start, POSITION end)
 
 	//reverse destruction of smallstone if it happened
 	if (abs(start.first - end.first) == 2 || abs(start.second - end.second) == 2)
-		smallstone_count = smallstone_count > 0 ? smallstone_count + 1 : 0;
+	{
+		short mid_x = start.first + (end.first - start.first) / 2;
+		short mid_y = start.second + (end.second - start.second) / 2;
 
+		if (board[mid_x][mid_y] == EMPTY)
+			board[mid_x][mid_y] = 'b';
+		else if (board[mid_x][mid_y] == 'b')
+			board[mid_x][mid_y] = '2';
+		else
+			board[mid_x][mid_y]++;
+
+		smallstone_count = smallstone_count > 0 ? smallstone_count + 1 : 0;
+	}
+	board[end.first][end.second] = EMPTY;
 	return 1;
 }
 
@@ -143,15 +169,16 @@ int Board::get_points(PLAYER player)
 {
 	short count_bigstone_cannot_move = 0;
 	//check if bigstone can move or not
-	for (short i = 0; i < 4; i++)
+	for (short i = 1; i <= maxRows; i++)
 	{
-		if (is_stuck(bigstone_loc[i]))
-			count_bigstone_cannot_move++;
+		for(short j=1; j<=maxCols; j++)
+			if (is_stuck(POSITION(i,j)))
+				count_bigstone_cannot_move++;
 	}
 
 	if (player == BIGSTONE)
 	{
-		return count_bigstone_cannot_move * 5 + (20 - smallstone_count) - smallstone_count;
+		return count_bigstone_cannot_move * 5 - (20 - smallstone_count) + smallstone_count;
 	}
 	else
 		return 5 * count_bigstone_cannot_move + smallstone_count - (20 - smallstone_count);
@@ -191,18 +218,23 @@ std::vector<POSITION> Board::generate_moves(POSITION loc)
 		}
 	}
 
+	short mid_x, mid_y;
 	if (board[loc.first][loc.second] == BIGSTONE)
 	{
 		for (short i = 0; i < 4; i++)
 		{
 			newPos.first = loc.first + noncrossmove_x[i]*2;
 			newPos.second = loc.second + noncrossmove_y[i]*2;
+			
+			mid_x = loc.first + (newPos.first - loc.first) / 2;
+			mid_y = loc.second + (newPos.second - loc.second) / 2;
 
-			if (valid_pos(newPos) && board[loc.first + (newPos.first - loc.first) / 2][loc.second + (newPos.second - loc.second) / 2] != SMALLSTONE)
+			if (valid_pos(newPos) && board[mid_x][mid_y] != SMALLSTONE && !(board[mid_x][mid_y]>='2' && board[mid_x][mid_y]<='4'))
 				continue;
 
 			if (valid_pos(newPos) && board[newPos.first][newPos.second] == EMPTY)
 				moves.emplace_back(newPos);
+
 		}
 
 		if (can_cross(loc))
@@ -212,8 +244,11 @@ std::vector<POSITION> Board::generate_moves(POSITION loc)
 				newPos.first = loc.first + 2 * crossmove_x[i];
 				newPos.second = loc.second + 2 * crossmove_y[i];
 
-				if (valid_pos(newPos) && board[loc.first + (newPos.first - loc.first) / 2][loc.second + (newPos.second - loc.second) / 2] != SMALLSTONE)
-					continue;
+				mid_x = loc.first + (newPos.first - loc.first) / 2;
+				mid_y = loc.second + (newPos.second - loc.second) / 2;
+
+				if (valid_pos(newPos) && board[mid_x][mid_y] != SMALLSTONE && !(board[mid_x][mid_y] >= '2' && board[mid_x][mid_y] <= '4'))
+				continue;
 
 				if (valid_pos(newPos) && board[newPos.first][newPos.second] == EMPTY)
 					moves.emplace_back(newPos);
@@ -236,7 +271,8 @@ bool Board::smallstonewin()
 
 void Board::generate_moves(PLAYER player, 
 	std::vector<std::pair<POSITION, std::vector<POSITION>> >&moves)
-{
+{	
+	//std::cout << char(player) << "\n";
 	for (short i = 1; i <= maxRows; i++)
 	{
 		for (short j = 1; j <= maxCols; j++)
@@ -244,6 +280,13 @@ void Board::generate_moves(PLAYER player,
 			if (board[i][j] == player || (player == SMALLSTONE && board[i][j]!=BIGSTONE && board[i][j]!=EMPTY))
 			{
 				moves.emplace_back(std::make_pair(POSITION(i, j), generate_moves(POSITION(i, j))));
+				/*std::cout << "(" << i << "," << j << ") ->";
+				for (auto x : moves[moves.size() - 1].second)
+					std::cout << "(" << x.first << "," << x.second << "), ";
+				std::cout << "\n";*/
+
+				if (moves[moves.size() - 1].second.empty())
+					moves.pop_back();
 			}
 		}
 	}
