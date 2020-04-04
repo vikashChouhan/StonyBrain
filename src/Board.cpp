@@ -40,6 +40,11 @@ inline bool Board::can_cross(POSITION loc)
 {
 	if (loc.first == loc.second || (loc.first - 1 == 5 - loc.second))
 		return true;
+	short one = 1, three = 3, five = 5;
+	if (loc == std::make_pair(one, three) || loc == std::make_pair(three, five) 
+		|| loc == std::make_pair(five, three) || loc == std::make_pair(five, three))	
+		return true;
+
 	return false;
 }
 
@@ -297,13 +302,13 @@ bool Board::valid_move(std::pair<POSITION, POSITION> move, PLAYER player)
 {
 	std::vector<POSITION> possibleMoves = generate_moves(move.first);
 
-	if (!valid_pos(move.first) || !valid_pos(move.second))
+	if (!valid_pos(move.first) || !valid_pos(move.second) || board[move.first.first][move.first.second]!=player)
 		return false;
 	
-	std::cout << "\n";
+	//std::cout << "\n";
 	for (auto& newLoc : possibleMoves)
 	{
-		std::cout << newLoc.first << " " << newLoc.second << "\n";
+		//std::cout << newLoc.first << " " << newLoc.second << "\n";
 		if (move.second == newLoc)
 			return true;
 	}
