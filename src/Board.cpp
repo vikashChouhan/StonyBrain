@@ -183,10 +183,10 @@ int Board::get_points(PLAYER player)
 
 	if (player == BIGSTONE)
 	{
-		return count_bigstone_cannot_move * 20 - (20 - smallstone_count) + 2*smallstone_count;
+		return count_bigstone_cannot_move * 100 - (20 - smallstone_count) + 2*smallstone_count;
 	}
 	else
-		return 20 * count_bigstone_cannot_move + smallstone_count - 2*(20 - smallstone_count);
+		return 100 * count_bigstone_cannot_move + smallstone_count - (20 - smallstone_count);
 }
 
 
@@ -301,10 +301,16 @@ void Board::generate_moves(PLAYER player,
 bool Board::valid_move(std::pair<POSITION, POSITION> move, PLAYER player)
 {
 	std::vector<POSITION> possibleMoves = generate_moves(move.first);
-
-	if (!valid_pos(move.first) || !valid_pos(move.second) || board[move.first.first][move.first.second]!=player)
+	
+	if (!valid_pos(move.first) || !valid_pos(move.second) || board[move.first.first][move.first.second] == EMPTY)
 		return false;
 	
+	if (player == SMALLSTONE && board[move.first.first][move.first.second] == BIGSTONE)
+		return false;
+
+	if(player == BIGSTONE && (board[move.first.first][move.first.second]!=BIGSTONE))
+		return false;
+
 	//std::cout << "\n";
 	for (auto& newLoc : possibleMoves)
 	{
