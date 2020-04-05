@@ -98,11 +98,12 @@ int agent::get_move(Board &currBoard, int depth, PLAYER player, std::pair<POSITI
 void agent::make_move(Board& board)
 {
 	std::pair<POSITION, POSITION> move;
-	//std::cout << "change of computer : " << char(_player) << "\n";
+	std::cout << "change of computer : " << char(_player) << " Wait ....\n";
 	get_move(board, 0, _player, move, -INF, +INF);
 	//std::cout << move.first.first << " " << move.first.second << " ->" << move.second.first << " " << move.second.second<<"\n";
 	//std::cout << "starting moves... \n";
-	std::cout << "\n(" << move.first.first << "," << move.first.second << ")->(" << move.second.first << "," << move.second.second << ")\n";
+	/*std::cout << "\n(" << move.first.first << "," << move.first.second << ")->(" << move.second.first << "," << move.second.second << ")\n";
+	std::system("pause");*/
 	board.make_move(move.first, move.second);
 	//board.print_board();
 }

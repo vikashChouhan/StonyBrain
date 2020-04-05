@@ -41,8 +41,8 @@ inline bool Board::can_cross(POSITION loc)
 	if (loc.first == loc.second || (loc.first - 1 == 5 - loc.second))
 		return true;
 	short one = 1, three = 3, five = 5;
-	if (loc == std::make_pair(one, three) || loc == std::make_pair(three, five) 
-		|| loc == std::make_pair(five, three) || loc == std::make_pair(five, three))	
+	if (loc == std::make_pair(one, three) || loc == std::make_pair(three, one) 
+		|| loc == std::make_pair(five, three) || loc == std::make_pair(three, three))	
 		return true;
 
 	return false;
@@ -252,7 +252,7 @@ std::vector<POSITION> Board::generate_moves(POSITION loc)
 				mid_x = loc.first + (newPos.first - loc.first) / 2;
 				mid_y = loc.second + (newPos.second - loc.second) / 2;
 
-				if (valid_pos(newPos) && board[mid_x][mid_y] != SMALLSTONE && !(board[mid_x][mid_y] >= '2' && board[mid_x][mid_y] <= '4'))
+				if (valid_pos(newPos) && (board[mid_x][mid_y] != SMALLSTONE && !(board[mid_x][mid_y] >= '2' && board[mid_x][mid_y] <= '4')))
 				continue;
 
 				if (valid_pos(newPos) && board[newPos.first][newPos.second] == EMPTY)
