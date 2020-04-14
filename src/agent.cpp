@@ -20,7 +20,6 @@ int agent::get_move(Board &currBoard, int depth, PLAYER player, std::pair<POSITI
 	if (player == SMALLSTONE)
 	{
 		std::vector<std::pair<POSITION, std::vector<POSITION>> > moves;
-		//std::getchar();
 		currBoard.generate_moves(player,moves);
 
 		long int bestval = -INF, value;
@@ -29,9 +28,7 @@ int agent::get_move(Board &currBoard, int depth, PLAYER player, std::pair<POSITI
 		{
 			for (auto& endPos : pos2mov.second)
 			{
-				//std::getchar();
 				currBoard.make_move(pos2mov.first, endPos);
-				//currBoard.print_board();
 				
 				value = get_move(currBoard, depth + 1, BIGSTONE, return_move,alpha,beta);
 				if (value > bestval)
@@ -65,9 +62,7 @@ int agent::get_move(Board &currBoard, int depth, PLAYER player, std::pair<POSITI
 		{
 			for (auto& endPos : pos2mov.second)
 			{
-				/*std::getchar();*/
 				currBoard.make_move(pos2mov.first, endPos);
-				//currBoard.print_board();
 				
 				value = get_move(currBoard, depth + 1, SMALLSTONE, return_move, alpha, beta);
 				
@@ -76,7 +71,6 @@ int agent::get_move(Board &currBoard, int depth, PLAYER player, std::pair<POSITI
 					best_move = std::make_pair(pos2mov.first, endPos);
 					bestval = value;
 				}
-				//std::cout << "reverse B\n";
 				currBoard.reverse_move(pos2mov.first, endPos);
 
 				if (optimize)
@@ -98,12 +92,9 @@ int agent::get_move(Board &currBoard, int depth, PLAYER player, std::pair<POSITI
 void agent::make_move(Board& board)
 {
 	std::pair<POSITION, POSITION> move;
-	std::cout << "change of computer : " << char(_player) << " Wait ....\n";
+	std::cout << "Computer's Move, Wait ....\n";
 	get_move(board, 0, _player, move, -INF, +INF);
-	//std::cout << move.first.first << " " << move.first.second << " ->" << move.second.first << " " << move.second.second<<"\n";
-	//std::cout << "starting moves... \n";
-	/*std::cout << "\n(" << move.first.first << "," << move.first.second << ")->(" << move.second.first << "," << move.second.second << ")\n";
-	std::system("pause");*/
+	
 	board.make_move(move.first, move.second);
-	//board.print_board();
+	
 }

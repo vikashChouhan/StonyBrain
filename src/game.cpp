@@ -52,35 +52,45 @@ void game::play()
 			short res = _board.make_move(move.first, move.second);
 			if (res == 0)
 				goto again1;
+
+			std::system("cls");
+			_board.print_board();
+			std::system("pause");
 		}
 		else
+		{
 			_computer.make_move(_board);
+			//printing board after each move
+			std::system("cls");
+			_board.print_board();
+			std::cout << "\n";
+		}
 
-		 //printing board after each move
-		std::system("cls");
-		_board.print_board();
-		std::cout << "\n";
-		std::system("pause");
 
 		if (_board.smallstonewin()) break;
 		
 		if (_userPlayer == SMALLSTONE)
+		{
 			_computer.make_move(_board);
+			//printing board after each move
+			std::system("cls");
+			_board.print_board();
+			std::cout << "\n";
+		}
 		else
 		{
-			again2:
+		again2:
 			move = get_user_move();
 			if (move.first.first == -1)
 				break;
 			short res = _board.make_move(move.first, move.second);
 			if (res == 0)
 				goto again2;
-		}
 
-		 //printing board after each move
-		std::system("cls");
-		_board.print_board();
-		std::cout << "\n";
+			std::system("cls");
+			_board.print_board();
+			std::system("pause");
+		}
 	}
 
 

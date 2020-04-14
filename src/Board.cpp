@@ -285,11 +285,7 @@ void Board::generate_moves(PLAYER player,
 			if (board[i][j] == player || (player == SMALLSTONE && board[i][j]!=BIGSTONE && board[i][j]!=EMPTY))
 			{
 				moves.emplace_back(std::make_pair(POSITION(i, j), generate_moves(POSITION(i, j))));
-				/*std::cout << "(" << i << "," << j << ") ->";
-				for (auto x : moves[moves.size() - 1].second)
-					std::cout << "(" << x.first << "," << x.second << "), ";
-				std::cout << "\n";*/
-
+				
 				if (moves[moves.size() - 1].second.empty())
 					moves.pop_back();
 			}
@@ -311,10 +307,8 @@ bool Board::valid_move(std::pair<POSITION, POSITION> move, PLAYER player)
 	if(player == BIGSTONE && (board[move.first.first][move.first.second]!=BIGSTONE))
 		return false;
 
-	//std::cout << "\n";
 	for (auto& newLoc : possibleMoves)
 	{
-		//std::cout << newLoc.first << " " << newLoc.second << "\n";
 		if (move.second == newLoc)
 			return true;
 	}
